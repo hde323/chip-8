@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/chip-8.dir/link.d "CMakeFiles/chip-8.dir/src/main.c.o" "CMakeFiles/chip-8.dir/src/graphics.c.o" "CMakeFiles/chip-8.dir/src/cpu.c.o" -o chip-8  /usr/lib/x86_64-linux-gnu/libSDL2.so -lm

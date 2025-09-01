@@ -1,0 +1,3 @@
+/home/hade/Documents/code/chip-8/build/CMakeFiles/chip-8.dir
+/home/hade/Documents/code/chip-8/build/CMakeFiles/edit_cache.dir
+/home/hade/Documents/code/chip-8/build/CMakeFiles/rebuild_cache.dir
