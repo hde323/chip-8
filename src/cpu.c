@@ -413,7 +413,7 @@ void IDXYN(Cpu *cpu, uint8_t x, uint8_t y, uint8_t n)
 
 void IEX9E(Cpu *cpu, uint8_t x)// skip instruction if keypad[vx] is pressed
 {
-    if(cpu->KeyPad[x] == 1)
+    if(cpu->KeyPad[cpu->V[x]] == 1)
       cpu->PC += 4;
     else
       cpu->PC += 2;
@@ -422,7 +422,7 @@ void IEX9E(Cpu *cpu, uint8_t x)// skip instruction if keypad[vx] is pressed
 
 void IEXA1(Cpu *cpu, uint8_t x)// skip instruction if keypad[vx] not pressed
 {
-    if(cpu->KeyPad[x] == 0)
+    if(cpu->KeyPad[cpu->V[x]] == 0)
       cpu->PC += 4;
     else
       cpu->PC += 2;
@@ -436,23 +436,20 @@ void IFX07(Cpu *cpu, uint8_t x)// vx = dt
     return;
 };
 
-void IFX0A(Cpu *cpu, uint8_t x)// wait kepressed store in vx
+void IFX0A(Cpu *cpu, uint8_t x)
 {
-    if (cpu->keyPressed == 1)
+    for (int i = 0; i < 16; i++)
     {
-        for (int i = 0; i < 16; i++)
+        if(cpu->KeyPad[i] == 1) // check all keys
         {
-            if(cpu->KeyPad[i] == 1)
-            {
-                cpu->V[x] = cpu->KeyPad[i];
-                break;
-            }
+            cpu->V[x] = i;      // store key index
+            cpu->PC += 2;       // advance PC
+            return;
         }
-        cpu->PC += 2;
-        return;
     }
-    return;
-};
+    // If no key pressed, do NOT advance PC (CPU "waits")
+}
+
 
 void IFX15(Cpu *cpu, uint8_t x)// dt = vx
 {

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+//debuging messages 
 void print_memory(uint8_t *mem, size_t start, size_t end, const char *label) {
     printf("=== %s ===\n", label);
     for (size_t i = start; i < end; i++) {
@@ -14,22 +15,16 @@ void print_memory(uint8_t *mem, size_t start, size_t end, const char *label) {
 
 int main(int argc, char **argv) {
     uint64_t looptimer = 0;
+    uint32_t lastInstructionEx = SDL_GetTicks();
+    uint32_t lastDisplayUpdate = SDL_GetTicks();
     Cpu cpu;
     memset(&cpu, 0, sizeof(Cpu));
-
-    // Initialize CPU (loads fonts)
     init_cpu(&cpu);
-
-    // Print font data (first 80 bytes, 0x00-0x4F)
     print_memory(cpu.Ram, 0x00, 0x50, "Font Data");
-
-    // Load ROM
-    if (load_cpu_program(&cpu, "../src/roms/TETRIS") != 0) {
+    if (load_cpu_program(&cpu, "../src/roms/BRIX") != 0) {
         printf("Failed to load ROM!\n");
         return 1;
     }
-
-    // Print loaded ROM memory (0x200 - 0x200 + rom size)
     print_memory(cpu.Ram, 0x200, 0x200 + 256, "Loaded ROM (first 256 bytes)");
 
     if (init_graphics() != 0) return 1;
@@ -38,9 +33,7 @@ int main(int argc, char **argv) {
     SDL_Event e;
 
     while (running) {
-        run_cpu_opcode(&cpu);
         while (SDL_PollEvent(&e)) {
-            //if (e.type == SDL_QUIT) running = false;
             switch (e.type)
             {
             case SDL_QUIT:
@@ -53,53 +46,53 @@ int main(int argc, char **argv) {
                 case SDLK_SPACE:
                     running = false;
                     break;
-                case SDLK_0:
-                    cpu.KeyPad[0] = 1;
-                    break;
                 case SDLK_1:
-                    cpu.KeyPad[1] = 1;
+                    cpu.KeyPad[0x1] = 1;
                     break;
                 case SDLK_2:
-                    cpu.KeyPad[2] = 1;
+                    cpu.KeyPad[0x2] = 1;
                     break;
                 case SDLK_3:
-                    cpu.KeyPad[3] = 1;
+                    cpu.KeyPad[0x3] = 1;
                     break;
                 case SDLK_4:
-                    cpu.KeyPad[4] = 1;
+                    cpu.KeyPad[0xC] = 1;
                     break;
-                case SDLK_5:
-                    cpu.KeyPad[5] = 1;
+                case SDLK_q:
+                    cpu.KeyPad[0x4] = 1;
                     break;
-                case SDLK_6:
-                    cpu.KeyPad[6] = 1;
-                    break;
-                case SDLK_7:
-                    cpu.KeyPad[7] = 1;
-                    break;
-                case SDLK_8:
-                    cpu.KeyPad[8] = 1;
-                    break;
-                case SDLK_9:
-                    cpu.KeyPad[9] = 1;
-                    break;
-                case SDLK_a:
-                    cpu.KeyPad[10] = 1;
-                    break;
-                case SDLK_b:
-                    cpu.KeyPad[11] = 1;
-                    break;
-                case SDLK_c:
-                    cpu.KeyPad[12] = 1;
-                    break;
-                case SDLK_d:
-                    cpu.KeyPad[13] = 1;
+                case SDLK_w:
+                    cpu.KeyPad[0x5] = 1;
                     break;
                 case SDLK_e:
-                    cpu.KeyPad[14] = 1;
+                    cpu.KeyPad[0x6] = 1;
+                    break;
+                case SDLK_r:
+                    cpu.KeyPad[0xD] = 1;
+                    break;
+                case SDLK_a:
+                    cpu.KeyPad[0x7] = 1;
+                    break;
+                case SDLK_s:
+                    cpu.KeyPad[0x8] = 1;
+                    break;
+                case SDLK_d:
+                    cpu.KeyPad[0x9] = 1;
                     break;
                 case SDLK_f:
-                    cpu.KeyPad[15] = 1;
+                    cpu.KeyPad[0xE] = 1;
+                    break;
+                case SDLK_z:
+                    cpu.KeyPad[0xA] = 1;
+                    break;
+                case SDLK_x:
+                    cpu.KeyPad[0x0] = 1;
+                    break;
+                case SDLK_c:
+                    cpu.KeyPad[0xB] = 1;
+                    break;
+                case SDLK_v:
+                    cpu.KeyPad[0xF] = 1;
                     break;
                 default:
                     break;
@@ -109,77 +102,77 @@ int main(int argc, char **argv) {
                 cpu.keyPressed = 0;
                 switch (e.key.keysym.sym)
                 {
-                case SDLK_SPACE:
-                    running = false;
-                    break;
-                case SDLK_0:
-                    cpu.KeyPad[0] = 0;
-                    break;
                 case SDLK_1:
-                    cpu.KeyPad[1] = 0;
+                    cpu.KeyPad[0x1] = 0;
                     break;
                 case SDLK_2:
-                    cpu.KeyPad[2] = 0;
+                    cpu.KeyPad[0x2] = 0;
                     break;
                 case SDLK_3:
-                    cpu.KeyPad[3] = 0;
+                    cpu.KeyPad[0x3] = 0;
                     break;
                 case SDLK_4:
-                    cpu.KeyPad[4] = 0;
+                    cpu.KeyPad[0xC] = 0;
                     break;
-                case SDLK_5:
-                    cpu.KeyPad[5] = 0;
+                case SDLK_q:
+                    cpu.KeyPad[0x4] = 0;
                     break;
-                case SDLK_6:
-                    cpu.KeyPad[6] = 0;
-                    break;
-                case SDLK_7:
-                    cpu.KeyPad[7] = 0;
-                    break;
-                case SDLK_8:
-                    cpu.KeyPad[8] = 0;
-                    break;
-                case SDLK_9:
-                    cpu.KeyPad[9] = 0;
-                    break;
-                case SDLK_a:
-                    cpu.KeyPad[10] = 0;
-                    break;
-                case SDLK_b:
-                    cpu.KeyPad[11] = 0;
-                    break;
-                case SDLK_c:
-                    cpu.KeyPad[12] = 0;
-                    break;
-                case SDLK_d:
-                    cpu.KeyPad[13] = 0;
+                case SDLK_w:
+                    cpu.KeyPad[0x5] = 0;
                     break;
                 case SDLK_e:
-                    cpu.KeyPad[14] = 0;
+                    cpu.KeyPad[0x6] = 0;
+                    break;
+                case SDLK_r:
+                    cpu.KeyPad[0xD] = 0;
+                    break;
+                case SDLK_a:
+                    cpu.KeyPad[0x7] = 0;
+                    break;
+                case SDLK_s:
+                    cpu.KeyPad[0x8] = 0;
+                    break;
+                case SDLK_d:
+                    cpu.KeyPad[0x9] = 0;
                     break;
                 case SDLK_f:
-                    cpu.KeyPad[15] = 0;
+                    cpu.KeyPad[0xE] = 0;
+                    break;
+                case SDLK_z:
+                    cpu.KeyPad[0xA] = 0;
+                    break;
+                case SDLK_x:
+                    cpu.KeyPad[0x0] = 0;
+                    break;
+                case SDLK_c:
+                    cpu.KeyPad[0xB] = 0;
+                    break;
+                case SDLK_v:
+                    cpu.KeyPad[0xF] = 0;
                     break;
                 default:
                     break;
                 }
-                break;
-            
             default:
                 break;
             }
+            break;
+            
         }
-        if(looptimer = 42)
+        uint32_t now = SDL_GetTicks();
+        if(now - lastInstructionEx >= 2)
         {
-           draw_graphics(&cpu);
-           if(cpu.DT > 0) cpu.DT --;
-           if(cpu.ST > 0) cpu.ST --;
-           looptimer = 0;
+            run_cpu_opcode(&cpu);
+            lastInstructionEx = now;
         }
-        looptimer ++;
-        SDL_Delay(1.428);
+        if(now - lastDisplayUpdate >= 16)
+        {
+            if(cpu.DT > 0) cpu.DT --;
+            if(cpu.ST > 0) cpu.ST --;
+            draw_graphics(&cpu);
+            lastDisplayUpdate = now;
+        }
     }
-
     close_graphics();
     return 0;
 }
